@@ -97,3 +97,14 @@ section {
         }
     }
 }
+:host(.centered-layout) main {
+  justify-content: center; 
+
+  .form-section {
+    flex-grow: 0;
+  }
+
+  .main-section {
+    display: none;
+  }
+}
