@@ -1,0 +1,10 @@
+<app-header></app-header>
+<main class="feed-container">
+  <h1 class="title">Encontre seu novo amigo</h1>
+  <p class="subtitle">Navegue pelos pets disponíveis para adoção</p>
+  <div class="pets-grid">
+    @for (pet of pets; track pet.id) {
+      <app-pet-card [pet]="pet"></app-pet-card>
+    }
+  </div>
+</main>

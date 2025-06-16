@@ -6,10 +6,9 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
 
-// Interface atualizada para suportar múltiplos arquivos
 interface PetForm {
   nome: FormControl<string | null>;
-  tipoAnimal: FormControl<string | null>;
+  tipoAnimal: FormControl<string | null>; // especie
   raca: FormControl<string | null>;
   idade: FormControl<number | null>;
   porte: FormControl<string | null>;
