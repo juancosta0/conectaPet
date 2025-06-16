@@ -1,0 +1,68 @@
+@import "../../../styles/variables.scss";
+
+form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 0px;
+}
+
+
+.input-wrapper {
+    color: $text-color;
+    font-size: 16px;
+    text-align: start;
+
+    label {
+        margin-bottom: 10px;
+        display: inline-block;
+    }
+}
+
+.form-label {
+  color: $text-color;
+  font-size: 16px;
+  margin-bottom: -15px;
+}
+
+// Grupo de Radio Buttons
+.radio-group-material {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: $gray-secondary-bg;
+  border-radius: 8px;
+  padding: 8px 15px;
+  margin-top: 10px;
+
+  ::ng-deep {
+    .mat-mdc-radio-button.mat-accent {
+      --mdc-radio-selected-icon-color: #{$primary-color};
+      --mat-radio-checked-ripple-color: #{$primary-color};
+    }
+  }
+
+  mat-radio-button {
+      color: $text-color;
+  }
+}
+
+.input-content.textarea {
+    background-color: $gray-secondary-bg;
+    border-radius: 8px;
+    padding: 12px 20px;
+    display: flex;
+
+    textarea {
+        width: 100%;
+        background-color: transparent;
+        border: none;
+        font-family: inherit;
+        font-size: 14px;
+        color: $text-color;
+        resize: vertical;
+        min-height: 80px;
+
+    }
+}
