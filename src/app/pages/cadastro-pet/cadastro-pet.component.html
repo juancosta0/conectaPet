@@ -1,0 +1,94 @@
+<!-- Ativamos o layout centralizado com a propriedade layoutMode="centered" -->
+<app-default-login-layout
+    layoutMode="centered"
+    title="Cadastrar Novo Pet"
+    primaryBtnText="Cadastrar Pet"
+    secondaryBtnText="Voltar para Home"
+    (submit)="submit()"
+    (navigate)="navigate()"
+    [disablePrimaryBtn]="!petForm.valid"
+>
+  <form [formGroup]="petForm">
+    <!-- Campos existentes do formulário -->
+    <app-primary-input
+        formControlName="nome"
+        inputName="nome"
+        type="text"
+        label="Nome do Pet"
+        placeholder="Rex">
+        <img src="/assets/svg/email-icon.svg"/>
+    </app-primary-input>
+    <app-primary-input
+        formControlName="tipoAnimal"
+        inputName="tipoAnimal"
+        type="text"
+        label="Tipo de Animal"
+        placeholder="Cachorro">
+        <img src="/assets/svg/email-icon.svg"/>
+    </app-primary-input>
+    <app-primary-input
+        formControlName="raca"
+        inputName="raca"
+        type="text"
+        label="Raça"
+        placeholder="Vira-lata">
+        <img src="/assets/svg/email-icon.svg"/>
+    </app-primary-input>
+    <app-primary-input
+        formControlName="idade"
+        inputName="idade"
+        type="number"
+        label="Idade"
+        placeholder="2">
+        <img src="/assets/svg/email-icon.svg"/>
+    </app-primary-input>
+    <app-primary-input
+        formControlName="porte"
+        inputName="porte"
+        type="text"
+        label="Porte"
+        placeholder="Médio">
+        <img src="/assets/svg/email-icon.svg"/>
+    </app-primary-input>
+    <app-primary-input
+        formControlName="cor"
+        inputName="cor"
+        type="text"
+        label="Cor"
+        placeholder="Caramelo">
+        <img src="/assets/svg/email-icon.svg"/>
+    </app-primary-input>
+    <div class="input-wrapper">
+      <label for="descricao">Descrição</label>
+      <div class="input-content textarea">
+          <textarea
+            id="descricao"
+            formControlName="descricao"
+            placeholder="Fale um pouco sobre o pet..."
+          ></textarea>
+      </div>
+    </div>
+
+    <!-- Campo para upload de imagem -->
+    <div class="image-upload-wrapper">
+      <label for="imagens" class="upload-label">
+        <img src="/assets/svg/upload-icon.svg" alt="Upload Icon" width="24">
+        <span>Anexar foto(s) do pet</span>
+      </label>
+      <input
+        type="file"
+        id="imagens"
+        accept="image/*"
+        multiple
+        (change)="onFileSelected($event)"
+      >
+      <!-- Galeria de pré-visualização -->
+      <div *ngIf="previewUrls.length > 0" class="image-preview-gallery">
+        <div *ngFor="let url of previewUrls; let i = index" class="preview-item">
+          <img [src]="url" alt="Pré-visualização da imagem {{ i + 1 }}">
+          <button type="button" class="remove-btn" (click)="removeImage(i)">&times;</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</app-default-login-layout>

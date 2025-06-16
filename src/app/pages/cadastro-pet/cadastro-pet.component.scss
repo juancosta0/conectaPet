@@ -1,0 +1,124 @@
+@import "../../../styles/variables.scss";
+
+form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-wrapper {
+    color: $text-color;
+    font-size: 16px;
+    text-align: start;
+
+    label {
+        margin-bottom: 10px;
+        display: inline-block;
+    }
+}
+
+.input-content.textarea {
+    background-color: $gray-secondary-bg;
+    border-radius: 8px;
+    padding: 12px 20px;
+    display: flex;
+
+    textarea {
+        width: 100%;
+        background-color: transparent;
+        border: none;
+        font-family: inherit;
+        font-size: 14px;
+        color: $text-color;
+        resize: vertical;
+        min-height: 80px;
+    }
+}
+
+// Estilos para o campo de upload de imagem
+.image-upload-wrapper {
+  color: $text-color;
+  // Alinha o próprio bloco ao centro dentro do formulário flex
+  align-self: center;
+
+  input[type="file"] {
+    display: none;
+  }
+
+  .upload-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background-color: $gray-secondary-bg;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px dashed $primary-color;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: darken($gray-secondary-bg, 5%);
+    }
+
+    img {
+      width: 24px;
+      height: 24px;
+      min-width: 24px; // Garante que o elemento não encolha e quebre o texto alternativo
+    }
+
+    span {
+      font-size: 14px;
+    }
+  }
+
+  // Estilos para a galeria de pré-visualização
+  .image-preview-gallery {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    // Mantém a justificação ao centro para alinhar a galeria
+    justify-content: center;
+  }
+
+  .preview-item {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid $gray-secondary-bg;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 24px;
+      height: 24px;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: rgba(255, 0, 0, 0.8);
+      }
+    }
+  }
+}

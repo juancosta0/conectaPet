@@ -1,13 +1,16 @@
-import { Component, forwardRef, Input } from '@angular/core';
+import { Component, Input, forwardRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
-
-type InputTypes = "text" | "email" | "password"
+type InputTypes = "text" | "email" | "password" | "number"; // <<-- ADICIONADO "number"
 
 @Component({
   selector: 'app-primary-input',
   standalone: true,
-  imports: [ ReactiveFormsModule ],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule
+  ],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -18,7 +21,6 @@ type InputTypes = "text" | "email" | "password"
   templateUrl: './primary-input.component.html',
   styleUrl: './primary-input.component.scss'
 })
-
 export class PrimaryInputComponent implements ControlValueAccessor {
   @Input() type: InputTypes = "text";
   @Input() placeholder: string = "";
@@ -29,7 +31,7 @@ export class PrimaryInputComponent implements ControlValueAccessor {
   onChange: any = () => {}
   onTouched: any = () => {}
 
-   onInput(event: Event){
+  onInput(event: Event){
     const value = (event.target as HTMLInputElement).value
     this.onChange(value)
   }
@@ -45,6 +47,4 @@ export class PrimaryInputComponent implements ControlValueAccessor {
   registerOnTouched(fn: any): void {
     this.onTouched = fn
   }
-
-  setDisabledState(isDisabled: boolean): void {}
 }
