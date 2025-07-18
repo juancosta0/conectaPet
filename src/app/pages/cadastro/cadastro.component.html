@@ -7,7 +7,6 @@
     [disablePrimaryBtn]="!cadastroForm.valid"
 >
     <form [formGroup]="cadastroForm">
-      <!-- Seleção do tipo de conta -->
       <div class="account-type-section">
         <label class="form-label">Tipo de conta:</label>
         <mat-radio-group class="radio-group-material" formControlName="userType">
@@ -32,10 +31,9 @@
         </mat-radio-group>
       </div>
 
-      <!-- Campos básicos -->
       <div class="form-section">
         <h3 class="section-title">Informações Básicas</h3>
-        
+
         <app-primary-input
             formControlName="name"
             inputName="name"
@@ -72,9 +70,8 @@
           </app-primary-input>
         </div>
 
-        <!-- Validação de senha -->
         <div class="password-requirements" *ngIf="cadastroForm.get('password')?.touched">
-          <small class="requirement" [class.valid]="cadastroForm.get('password')?.value?.length >= 6">
+          <small class="requirement" [class.valid]="(cadastroForm.get('password')?.value?.length ?? 0) >= 6">
             ✓ Mínimo 6 caracteres
           </small>
           <small class="requirement" [class.valid]="passwordsMatch()" *ngIf="cadastroForm.get('passwordConfirm')?.value">
@@ -83,10 +80,9 @@
         </div>
       </div>
 
-      <!-- Campos específicos para ONG -->
       <div class="form-section ong-section" *ngIf="cadastroForm.get('userType')?.value === 'ong'">
         <h3 class="section-title">Informações da ONG</h3>
-        
+
         <app-primary-input
             formControlName="cnpj"
             inputName="cnpj"
@@ -112,13 +108,12 @@
         </div>
       </div>
 
-      <!-- Termos e condições -->
       <div class="terms-section">
         <label class="checkbox-wrapper">
           <input type="checkbox" formControlName="acceptTerms">
           <span class="checkmark"></span>
           <span class="terms-text">
-            Eu aceito os <a href="#" class="terms-link">Termos de Uso</a> e 
+            Eu aceito os <a href="#" class="terms-link">Termos de Uso</a> e
             <a href="#" class="terms-link">Política de Privacidade</a>
           </span>
         </label>

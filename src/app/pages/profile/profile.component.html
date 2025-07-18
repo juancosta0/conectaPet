@@ -16,7 +16,6 @@
       </button>
     </div>
 
-    <!-- Modo de Edição -->
     <div class="edit-form" *ngIf="isEditMode">
       <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
         <div class="form-grid">
@@ -74,7 +73,6 @@
       </form>
     </div>
 
-    <!-- Informações da ONG (modo visualização) -->
     <div class="ong-info" *ngIf="user.userType === 'ong' && !isEditMode">
       <h2>Sobre a ONG</h2>
       <div class="ong-details">
@@ -89,12 +87,11 @@
       </div>
     </div>
 
-    <!-- Estatísticas -->
     <div class="profile-stats">
       <h2>Estatísticas</h2>
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-number">{{ user.favoritesPets?.length || 0 }}</div>
+          <div class="stat-number">{{ user.favoritesPets.length || 0 }}</div>
           <div class="stat-label">Pets Favoritados</div>
         </div>
         <div class="stat-card" *ngIf="user.userType === 'adotante'">

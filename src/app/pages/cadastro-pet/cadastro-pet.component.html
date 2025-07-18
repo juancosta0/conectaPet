@@ -8,13 +8,12 @@
     [disablePrimaryBtn]="!petForm.valid"
 >
   <form [formGroup]="petForm">
-    <!-- Informações Básicas -->
     <div class="form-section">
       <h3 class="section-title">
         <span class="section-icon">🐾</span>
         Informações Básicas
       </h3>
-      
+
       <div class="form-row">
         <app-primary-input
             formControlName="nome"
@@ -61,13 +60,12 @@
       </div>
     </div>
 
-    <!-- Características Físicas -->
     <div class="form-section">
       <h3 class="section-title">
         <span class="section-icon">📏</span>
         Características Físicas
       </h3>
-      
+
       <div class="form-row">
         <div class="input-wrapper">
           <label for="porte">Porte *</label>
@@ -92,13 +90,12 @@
       </div>
     </div>
 
-    <!-- Sobre o Pet -->
     <div class="form-section">
       <h3 class="section-title">
         <span class="section-icon">💝</span>
         Sobre o Pet
       </h3>
-      
+
       <div class="input-wrapper">
         <label for="descricao">Descrição *</label>
         <div class="input-content textarea">
@@ -118,13 +115,12 @@
       </div>
     </div>
 
-    <!-- Upload de Fotos -->
     <div class="form-section photo-section">
       <h3 class="section-title">
         <span class="section-icon">📸</span>
         Fotos do Pet
       </h3>
-      
+
       <div class="image-upload-wrapper">
         <label for="imagens" class="upload-label" [class.has-images]="previewUrls.length > 0">
           <div class="upload-content">
@@ -143,8 +139,7 @@
           multiple
           (change)="onFileSelected($event)"
         >
-        
-        <!-- Galeria de pré-visualização -->
+
         <div *ngIf="previewUrls.length > 0" class="image-preview-gallery">
           <div *ngFor="let url of previewUrls; let i = index" class="preview-item">
             <img [src]="url" alt="Pré-visualização da imagem {{ i + 1 }}">
@@ -159,7 +154,6 @@
       </div>
     </div>
 
-    <!-- Informações Importantes -->
     <div class="info-section">
       <div class="info-card">
         <span class="info-icon">ℹ️</span>

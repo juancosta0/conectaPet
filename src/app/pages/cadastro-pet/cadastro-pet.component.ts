@@ -107,7 +107,7 @@ export class CadastroPetComponent {
   submit() {
     if (this.petForm.valid) {
       const formData = this.petForm.value;
-      
+
       // Validações adicionais
       if (!this.previewUrls.length) {
         this.toastr.warning('Adicione pelo menos uma foto do pet!');
@@ -116,7 +116,7 @@ export class CadastroPetComponent {
 
       console.log('Dados do pet:', formData);
       console.log('Número de imagens:', this.previewUrls.length);
-      
+
       this.toastr.success('Pet cadastrado com sucesso! 🎉');
       this.router.navigate(['/feed']);
     } else {
