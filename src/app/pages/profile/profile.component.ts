@@ -103,9 +103,11 @@ export class ProfileComponent implements OnInit {
 
       this.userService.updateProfile(updateData).subscribe({
         next: (updatedUser) => {
+          if (updatedUser) {
           this.user = updatedUser;
           this.isEditMode = false;
           this.toastr.success('Perfil atualizado com sucesso!');
+          }
         },
         error: () => {
           this.toastr.error('Erro ao atualizar perfil. Tente novamente.');
