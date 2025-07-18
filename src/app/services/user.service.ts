@@ -33,7 +33,7 @@ export class UserService {
     return this.currentUserSubject.value;
   }
 
-  updateProfile(userData: Partial<UserProfile>): Observable<UserProfile> {
+  updateProfile(userData: Partial<UserProfile>): Observable<UserProfile | null> {
     // Mock implementation - em produção faria requisição HTTP
     const current = this.currentUserSubject.value;
     if (current) {
