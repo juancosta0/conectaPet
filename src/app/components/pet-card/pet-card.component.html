@@ -1,9 +1,17 @@
-<div class="pet-card">
+<div class="pet-card" (click)="onCardClick()">
   <div class="pet-image-container">
     <img [src]="pet.imageUrls[0]" [alt]="'Foto de ' + pet.name" *ngIf="pet.imageUrls.length > 0">
     <div class="no-image" *ngIf="pet.imageUrls.length === 0">
       <span>Sem foto</span>
     </div>
+    <button 
+      class="favorite-btn" 
+      [class.favorited]="isFavorite"
+      (click)="toggleFavorite($event)"
+      type="button"
+    >
+      <span class="heart-icon">{{ isFavorite ? '❤️' : '🤍' }}</span>
+    </button>
   </div>
   <div class="pet-info">
     <h3 class="pet-name">{{ pet.name }}</h3>

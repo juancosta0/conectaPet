@@ -1,0 +1,29 @@
+<app-header></app-header>
+<main class="favorites-container">
+  <div class="favorites-header">
+    <h1 class="title">Meus Favoritos</h1>
+    <p class="subtitle">Pets que você salvou para adoção</p>
+  </div>
+
+  <div class="favorites-content" *ngIf="favoritePets.length > 0; else noFavorites">
+    <div class="pets-grid">
+      @for (pet of favoritePets; track pet.id) {
+        <app-pet-card 
+          [pet]="pet"
+          (favoriteToggled)="onFavoriteToggled($event)"
+        ></app-pet-card>
+      }
+    </div>
+  </div>
+
+  <ng-template #noFavorites>
+    <div class="no-favorites">
+      <div class="no-favorites-icon">💔</div>
+      <h2>Nenhum pet favoritado ainda</h2>
+      <p>Explore nossos pets disponíveis e favorite aqueles que mais te interessam!</p>
+      <button class="btn-explore" (click)="goToFeed()">
+        Explorar Pets
+      </button>
+    </div>
+  </ng-template>
+</main>
