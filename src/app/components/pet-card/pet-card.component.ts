@@ -26,16 +26,19 @@ export class PetCardComponent {
 
   toggleFavorite(event: Event): void {
     event.stopPropagation();
-    
-    if (this.isFavorite) {
+
+    const currentState = this.isFavorite;
+
+    if (currentState) {
       this.favoritesService.removeFromFavorites(this.pet.id);
     } else {
       this.favoritesService.addToFavorites(this.pet.id);
     }
-    
-    this.favoriteToggled.emit({ 
-      petId: this.pet.id, 
-      isFavorite: !this.isFavorite 
+
+    // Emite o novo estado do "favorito"
+    this.favoriteToggled.emit({
+      petId: this.pet.id,
+      isFavorite: !currentState
     });
   }
 

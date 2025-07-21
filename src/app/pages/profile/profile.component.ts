@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderComponent } from '../../components/header/header.component';
@@ -6,6 +6,7 @@ import { PrimaryInputComponent } from '../../components/primary-input/primary-in
 import { UserProfile } from '../../types/user.type';
 import { UserService } from '../../services/user.service';
 import { ToastrService } from 'ngx-toastr';
+import { Subject, takeUntil } from 'rxjs';
 
 interface ProfileForm {
   name: FormControl<string | null>;
@@ -21,10 +22,11 @@ interface ProfileForm {
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
   user: UserProfile | null = null;
   isEditMode = false;
   profileForm!: FormGroup<ProfileForm>;
+  private unsubscribe$ = new Subject<void>();
 
   constructor(
     private userService: UserService,
@@ -37,20 +39,29 @@ export class ProfileComponent implements OnInit {
     this.loadUserProfile();
   }
 
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
   private initializeForm(): void {
     this.profileForm = new FormGroup({
       name: new FormControl('', [Validators.required, Validators.minLength(3)]),
-      email: new FormControl('', [Validators.required, Validators.email]),
+      email: new FormControl({ value: '', disabled: true }, [Validators.required, Validators.email]),
       cnpj: new FormControl(''),
       description: new FormControl('')
     });
   }
 
   private loadUserProfile(): void {
-    this.user = this.userService.getCurrentUser();
-    if (this.user) {
-      this.updateFormWithUserData();
-    }
+    this.userService.currentUser$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(user => {
+        this.user = user;
+        if (this.user) {
+          this.updateFormWithUserData();
+        }
+      });
   }
 
   private updateFormWithUserData(): void {
@@ -69,7 +80,7 @@ export class ProfileComponent implements OnInit {
     return this.user.userType === 'ong' ? 'ONG' : 'Adotante';
   }
 
-  formatDate(date: Date): string {
+  formatDate(date: Date | string): string {
     return new Intl.DateTimeFormat('pt-BR', {
       year: 'numeric',
       month: 'long'
@@ -90,23 +101,21 @@ export class ProfileComponent implements OnInit {
 
   saveProfile(): void {
     if (this.profileForm.valid && this.user) {
-      const formData = this.profileForm.value;
+      const formData = this.profileForm.getRawValue();
       const updateData: Partial<UserProfile> = {
         name: formData.name || '',
-        email: formData.email || ''
       };
 
       if (this.user.userType === 'ong') {
-        updateData.cnpj = formData.cnpj || '';
         updateData.description = formData.description || '';
       }
 
       this.userService.updateProfile(updateData).subscribe({
         next: (updatedUser) => {
           if (updatedUser) {
-          this.user = updatedUser;
-          this.isEditMode = false;
-          this.toastr.success('Perfil atualizado com sucesso!');
+            this.user = updatedUser;
+            this.isEditMode = false;
+            this.toastr.success('Perfil atualizado com sucesso!');
           }
         },
         error: () => {
