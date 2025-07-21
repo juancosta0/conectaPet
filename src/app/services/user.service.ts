@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { UserProfile } from '../types/user.type';
 
 @Injectable({
@@ -41,7 +42,7 @@ export class UserService {
   updateProfile(userData: Partial<UserProfile>): Observable<UserProfile | null> {
     return this.http.put<UserProfile>(`${this.apiUrl}/profile`, userData, { headers: this.getAuthHeaders() })
       .pipe(
-        tap((updatedUser) => this.currentUserSubject.next(updatedUser))
+        tap((updatedUser: UserProfile) => this.currentUserSubject.next(updatedUser))
       );
   }
 
