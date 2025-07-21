@@ -82,9 +82,26 @@ export class CadastroComponent implements OnInit {
         return;
       }
 
-      // Simula o cadastro
-      this.toastService.success('Cadastro realizado com sucesso!');
-      this.router.navigate(['feed']);
+      const formData = this.cadastroForm.value;
+      const registerData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        userType: formData.userType,
+        cnpj: formData.userType === 'ong' ? formData.cnpj : null,
+        description: formData.userType === 'ong' ? formData.descricao : null
+      };
+
+      this.loginService.register(registerData).subscribe({
+        next: () => {
+          this.toastService.success('Cadastro realizado com sucesso!');
+          this.router.navigate(['feed']);
+        },
+        error: (err) => {
+          this.toastService.error('Erro ao realizar cadastro. Tente novamente.');
+          console.error('Erro no cadastro:', err);
+        }
+      });
     } else {
       this.toastService.error('Por favor, preencha todos os campos obrigatórios!');
     }

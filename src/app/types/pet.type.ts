@@ -13,5 +13,7 @@ export interface Pet {
   color: string;        // Mapeado de 'cor'
   description: string;  // Mapeado de 'descricao'
   imageUrls: string[];  // Mapeado de 'imagens'. No front, teremos as URLs das imagens
-
+  ownerId?: number;     // ID do dono (ONG)
+  adoptionStatus?: string; // Status da adoção
+  createdAt?: Date;     // Data de criação
 }

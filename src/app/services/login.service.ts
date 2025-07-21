@@ -7,12 +7,21 @@ import { LoginResponse } from '../types/login-response.type';
   providedIn: 'root'
 })
 export class LoginService {
-  apiUrl: string = "http://localhost:8080/auth/login";
+  private apiUrl: string = "http://localhost:8080/auth";
 
   constructor(private httpClient: HttpClient) { }
 
   login(email: string, senha: string){
-    return this.httpClient.post<LoginResponse>(this.apiUrl, { email, senha }).pipe(
+    return this.httpClient.post<LoginResponse>(`${this.apiUrl}/login`, { email, password: senha }).pipe(
+      tap((value) => {
+        sessionStorage.setItem("auth-token", value.token)
+        sessionStorage.setItem("username", value.name)
+      })
+    )
+  }
+
+  register(userData: any) {
+    return this.httpClient.post<LoginResponse>(`${this.apiUrl}/register`, userData).pipe(
       tap((value) => {
         sessionStorage.setItem("auth-token", value.token)
         sessionStorage.setItem("username", value.name)

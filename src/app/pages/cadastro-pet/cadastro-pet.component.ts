@@ -5,6 +5,7 @@ import { PrimaryInputComponent } from '../../components/primary-input/primary-in
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { CommonModule } from '@angular/common';
+import { PetService } from '../../services/pet.service';
 
 interface PetForm {
   nome: FormControl<string | null>;
@@ -36,7 +37,8 @@ export class CadastroPetComponent {
 
   constructor(
     private router: Router,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private petService: PetService
   ) {
     this.petForm = new FormGroup({
       nome: new FormControl('', [Validators.required, Validators.minLength(2)]),
@@ -114,11 +116,27 @@ export class CadastroPetComponent {
         return;
       }
 
-      console.log('Dados do pet:', formData);
-      console.log('Número de imagens:', this.previewUrls.length);
+      const petData = {
+        name: formData.nome,
+        species: formData.tipoAnimal,
+        breed: formData.raca,
+        age: formData.idade,
+        size: formData.porte,
+        color: formData.cor,
+        description: formData.descricao,
+        imageUrls: this.previewUrls.map((url, index) => `pet-image-${Date.now()}-${index}.jpg`)
+      };
 
-      this.toastr.success('Pet cadastrado com sucesso! 🎉');
-      this.router.navigate(['/feed']);
+      this.petService.createPet(petData).subscribe({
+        next: () => {
+          this.toastr.success('Pet cadastrado com sucesso! 🎉');
+          this.router.navigate(['/feed']);
+        },
+        error: (err) => {
+          this.toastr.error('Erro ao cadastrar pet. Tente novamente.');
+          console.error('Erro no cadastro do pet:', err);
+        }
+      });
     } else {
       this.toastr.error('Por favor, preencha todos os campos obrigatórios.');
       this.markFormGroupTouched();
