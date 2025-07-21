@@ -41,17 +41,18 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-                // --- MUDANÇA PARA TESTE ---
-                // Permite TODAS as requisições temporariamente
+                // --- CONFIGURAÇÃO DE SEGURANÇA FINAL ---
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
+                        // Libera rotas de autenticação (login/cadastro)
+                        .requestMatchers("/auth/**").permitAll()
+                        // Libera a busca de pets para todos (método GET)
+                        .requestMatchers(HttpMethod.GET, "/api/pets/**").permitAll()
+                        // Exige autenticação para qualquer outra rota
+                        .anyRequest().authenticated()
                 )
-                // -------------------------
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
         return http.build();
     }
@@ -59,9 +60,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        // Lembre-se de colocar sua URL final da Netlify aqui
         configuration.setAllowedOrigins(Arrays.asList(
             "http://localhost:4200",
-            "https://SUA-URL-DO-NETLIFY.netlify.app" // TROQUE PELA SUA URL REAL
+            "https://SUA-URL-DO-NETLIFY.netlify.app"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
