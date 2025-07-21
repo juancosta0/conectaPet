@@ -1,51 +1,53 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { HeaderComponent } from '../../components/header/header.component';
 import { PetCardComponent } from '../../components/pet-card/pet-card.component';
 import { Pet } from '../../types/pet.type';
 import { FavoritesService } from '../../services/favorites.service';
 import { PetService } from '../../services/pet.service';
+import { Observable, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { HeaderComponent } from '../../components/header/header.component';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service'; // 1. Importe o AuthService
 
 @Component({
   selector: 'app-favorites',
   standalone: true,
-  imports: [CommonModule, HeaderComponent, PetCardComponent],
+  imports: [CommonModule, PetCardComponent, HeaderComponent],
   templateUrl: './favorites.component.html',
-  styleUrls: ['./favorites.component.scss']
+  styleUrls: ['./favorites.component.scss'],
 })
 export class FavoritesComponent implements OnInit {
-  favoritePets: Pet[] = [];
+  favoritePets$: Observable<Pet[]>;
+  favoritePetIds$: Observable<number[]>;
+  isAuthenticated$: Observable<boolean>; // 2. Crie a propriedade isAuthenticated$
 
   constructor(
     private favoritesService: FavoritesService,
     private petService: PetService,
-    private router: Router
-  ) {}
-
-  ngOnInit(): void {
-    this.loadFavorites();
-  }
-
-  private loadFavorites(): void {
-    const favoriteIds = this.favoritesService.getFavorites();
-    if (favoriteIds.length > 0) {
-      this.petService.getFavoritesPets(favoriteIds).subscribe({
-        next: (pets) => {
-          this.favoritePets = pets;
-        },
-        error: (error) => {
-          console.error('Erro ao carregar pets favoritos:', error);
+    private router: Router,
+    private authService: AuthService // 3. Injete o AuthService
+  ) {
+    this.favoritePetIds$ = this.favoritesService.favorites$;
+    this.isAuthenticated$ = this.authService.isAuthenticated$; // 4. Atribua o observable
+    this.favoritePets$ = this.favoritesService.favorites$.pipe(
+      switchMap(ids => {
+        if (ids.length === 0) {
+          return of([]);
         }
-      });
-    }
+        return this.petService.getFavoritesPets(ids);
+      })
+    );
   }
 
-  onFavoriteToggled(event: { petId: number, isFavorite: boolean }): void {
-    // Remove o pet da lista se foi desfavoritado
-    if (!event.isFavorite) {
-      this.favoritePets = this.favoritePets.filter(pet => pet.id !== event.petId);
-    }
+  ngOnInit(): void {}
+
+  onToggleFavorite(petId: number): void {
+    this.favoritesService.toggleFavorite(petId);
+  }
+
+  isPetFavorited(petId: number, favIds: number[] | null): boolean {
+    return favIds ? favIds.includes(petId) : false;
   }
 
   goToFeed(): void {

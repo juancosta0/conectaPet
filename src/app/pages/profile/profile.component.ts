@@ -6,7 +6,9 @@ import { PrimaryInputComponent } from '../../components/primary-input/primary-in
 import { UserProfile } from '../../types/user.type';
 import { UserService } from '../../services/user.service';
 import { ToastrService } from 'ngx-toastr';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, Observable, map } from 'rxjs';
+
+import { FavoritesService } from '../../services/favorites.service';
 
 interface ProfileForm {
   name: FormControl<string | null>;
@@ -28,11 +30,18 @@ export class ProfileComponent implements OnInit, OnDestroy {
   profileForm!: FormGroup<ProfileForm>;
   private unsubscribe$ = new Subject<void>();
 
+  favoriteCount$: Observable<number>;
+
   constructor(
     private userService: UserService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private favoritesService: FavoritesService 
   ) {
     this.initializeForm();
+    // E adicione esta linha para inicializar a contagem
+    this.favoriteCount$ = this.favoritesService.favorites$.pipe(
+      map(ids => ids.length)
+    );
   }
 
   ngOnInit(): void {

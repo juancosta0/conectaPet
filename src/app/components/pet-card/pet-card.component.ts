@@ -1,7 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Pet } from '../../types/pet.type';
 import { CommonModule } from '@angular/common';
-import { FavoritesService } from '../../services/favorites.service';
+import { Pet } from '../../types/pet.type';
 import { Router } from '@angular/router';
 
 @Component({
@@ -12,37 +11,19 @@ import { Router } from '@angular/router';
   styleUrls: ['./pet-card.component.scss']
 })
 export class PetCardComponent {
-  @Input({ required: true }) pet!: Pet;
-  @Output() favoriteToggled = new EventEmitter<{ petId: number, isFavorite: boolean }>();
+  @Input() pet!: Pet;
+  @Input() isFavorited: boolean = false;
+  @Input() isAuthenticated: boolean = false; 
+  @Output() toggleFavorite = new EventEmitter<number>();
 
-  constructor(
-    private favoritesService: FavoritesService,
-    private router: Router
-  ) {}
+  constructor(private router: Router) {}
 
-  get isFavorite(): boolean {
-    return this.favoritesService.isFavorite(this.pet.id);
-  }
-
-  toggleFavorite(event: Event): void {
-    event.stopPropagation();
-
-    const currentState = this.isFavorite;
-
-    if (currentState) {
-      this.favoritesService.removeFromFavorites(this.pet.id);
-    } else {
-      this.favoritesService.addToFavorites(this.pet.id);
-    }
-
-    // Emite o novo estado do "favorito"
-    this.favoriteToggled.emit({
-      petId: this.pet.id,
-      isFavorite: !currentState
-    });
-  }
-
-  onCardClick(): void {
+  onViewDetails(): void {
     this.router.navigate(['/pet', this.pet.id]);
+  }
+
+  onToggleFavorite(event: MouseEvent): void {
+    event.stopPropagation();
+    this.toggleFavorite.emit(this.pet.id);
   }
 }

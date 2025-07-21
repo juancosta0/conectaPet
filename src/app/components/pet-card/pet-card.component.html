@@ -1,16 +1,18 @@
-<div class="pet-card" (click)="onCardClick()">
+<div class="pet-card" (click)="onViewDetails()">
   <div class="pet-image-container">
-    <img [src]="pet.imageUrls[0]" [alt]="'Foto de ' + pet.name" *ngIf="pet.imageUrls.length > 0">
-    <div class="no-image" *ngIf="pet.imageUrls.length === 0">
+    <img [src]="pet.imageUrls[0]" [alt]="'Foto de ' + pet.name" *ngIf="pet.imageUrls && pet.imageUrls.length > 0">
+    <div class="no-image" *ngIf="!pet.imageUrls || pet.imageUrls.length === 0">
       <span>Sem foto</span>
     </div>
-    <button 
-      class="favorite-btn" 
-      [class.favorited]="isFavorite"
-      (click)="toggleFavorite($event)"
+
+    <button
+      *ngIf="isAuthenticated"
+      class="favorite-btn"
+      [class.favorited]="isFavorited"
+      (click)="onToggleFavorite($event)"
       type="button"
     >
-      <span class="heart-icon">{{ isFavorite ? '❤️' : '🤍' }}</span>
+      <span class="heart-icon">{{ isFavorited ? '❤️' : '🤍' }}</span>
     </button>
   </div>
   <div class="pet-info">

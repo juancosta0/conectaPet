@@ -4,11 +4,18 @@
       <span class="logo-text">ConectaPet</span>
     </a>
     <div class="nav-links">
-      <a routerLink="/feed" class="nav-link">Adotar</a>
-      <a routerLink="/favorites" class="nav-link">Favoritos</a>
-      <a routerLink="/cadastro-pet" class="nav-link">Cadastrar Pet</a>
-      <a routerLink="/profile" class="nav-link">Perfil</a>
-      <a routerLink="/login" class="nav-link logout">Sair</a>
+      <ng-container *ngIf="!(isAuthenticated$ | async)">
+        <a routerLink="/login" class="nav-link">Login</a>
+        <a routerLink="/cadastro" class="nav-link">Cadastre-se</a>
+      </ng-container>
+
+      <ng-container *ngIf="isAuthenticated$ | async">
+        <a routerLink="/feed" class="nav-link">Adotar</a>
+        <a routerLink="/favorites" class="nav-link">Favoritos</a>
+        <a routerLink="/cadastro-pet" class="nav-link">Cadastrar Pet</a>
+        <a routerLink="/profile" class="nav-link">Perfil</a>
+        <a (click)="logout()" class="nav-link logout" style="cursor: pointer;">Sair</a>
+      </ng-container>
     </div>
   </nav>
 </header>

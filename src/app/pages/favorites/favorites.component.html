@@ -1,29 +1,23 @@
 <app-header></app-header>
 <main class="favorites-container">
-  <div class="favorites-header">
-    <h1 class="title">Meus Favoritos</h1>
-    <p class="subtitle">Pets que você salvou para adoção</p>
-  </div>
-
-  <div class="favorites-content" *ngIf="favoritePets.length > 0; else noFavorites">
-    <div class="pets-grid">
-      @for (pet of favoritePets; track pet.id) {
-        <app-pet-card 
-          [pet]="pet"
-          (favoriteToggled)="onFavoriteToggled($event)"
-        ></app-pet-card>
-      }
+  <h1>Meus Pets Favoritos</h1>
+  <ng-container *ngIf="{ pets: favoritePets$ | async, ids: favoritePetIds$ | async, auth: isAuthenticated$ | async } as data">
+    <div *ngIf="data.pets && data.pets.length > 0; else noFavorites" class="favorites-grid">
+      <app-pet-card
+        *ngFor="let pet of data.pets"
+        [pet]="pet"
+        [isFavorited]="isPetFavorited(pet.id, data.ids)"
+        [isAuthenticated]="data.auth ?? false"
+        (toggleFavorite)="onToggleFavorite($event)">
+      </app-pet-card>
     </div>
-  </div>
+  </ng-container>
 
   <ng-template #noFavorites>
-    <div class="no-favorites">
-      <div class="no-favorites-icon">💔</div>
-      <h2>Nenhum pet favoritado ainda</h2>
-      <p>Explore nossos pets disponíveis e favorite aqueles que mais te interessam!</p>
-      <button class="btn-explore" (click)="goToFeed()">
-        Explorar Pets
-      </button>
+    <div class="no-favorites-content">
+      <p>Você ainda não tem pets favoritos.</p>
+      <p>Que tal explorar e encontrar um novo amigo?</p>
+      <button class="btn-explore" (click)="goToFeed()">Ver pets</button>
     </div>
   </ng-template>
 </main>

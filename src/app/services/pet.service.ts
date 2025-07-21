@@ -1,6 +1,7 @@
+// src/app/services/pet.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Pet } from '../types/pet.type';
 
 @Injectable({
@@ -19,10 +20,12 @@ export class PetService {
     };
   }
 
+  // Método público para buscar todos os pets
   getAllPets(): Observable<Pet[]> {
-    return this.http.get<Pet[]>(this.apiUrl, { headers: this.getAuthHeaders() });
+    return this.http.get<Pet[]>(this.apiUrl);
   }
 
+  // Métodos que exigem autenticação
   getPetById(id: number): Observable<Pet | undefined> {
     return this.http.get<Pet>(`${this.apiUrl}/${id}`, { headers: this.getAuthHeaders() });
   }

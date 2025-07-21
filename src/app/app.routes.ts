@@ -7,9 +7,9 @@ import { FeedComponent } from './pages/feed/feed.component';
 import { PetDetailsComponent } from './pages/pet-details/pet-details.component';
 import { FavoritesComponent } from './pages/favorites/favorites.component';
 import { ProfileComponent } from './pages/profile/profile.component';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-    // Rota padrão agora é o feed
     {
         path: '',
         redirectTo: 'feed',
@@ -25,29 +25,27 @@ export const routes: Routes = [
     },
     {
         path: "cadastro-pet",
-        component: CadastroPetComponent
+        component: CadastroPetComponent,
+        canActivate: [AuthGuard] // Protegendo a rota
     },
-    // Nova rota do feed
     {
         path: "feed",
         component: FeedComponent
     },
-    // Nova rota para detalhes do pet
     {
         path: "pet/:id",
         component: PetDetailsComponent
     },
-    // Nova rota para favoritos
     {
         path: "favorites",
-        component: FavoritesComponent
+        component: FavoritesComponent,
+        canActivate: [AuthGuard] // Protegendo a rota
     },
-    // Nova rota para perfil
     {
         path: "profile",
-        component: ProfileComponent
+        component: ProfileComponent,
+        canActivate: [AuthGuard] // Protegendo a rota
     },
-    // Redireciona qualquer rota não encontrada para o feed
     {
         path: '**',
         redirectTo: 'feed'

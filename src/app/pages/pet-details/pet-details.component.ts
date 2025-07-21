@@ -1,69 +1,77 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { HeaderComponent } from '../../components/header/header.component';
 import { Pet } from '../../types/pet.type';
 import { PetService } from '../../services/pet.service';
 import { FavoritesService } from '../../services/favorites.service';
-import { ToastrService } from 'ngx-toastr';
+import { HeaderComponent } from '../../components/header/header.component';
+import { Subscription, Observable } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-pet-details',
   standalone: true,
-  imports: [CommonModule, HeaderComponent],
+  imports: [CommonModule, RouterLink, HeaderComponent],
   templateUrl: './pet-details.component.html',
   styleUrls: ['./pet-details.component.scss']
 })
-export class PetDetailsComponent implements OnInit {
+export class PetDetailsComponent implements OnInit, OnDestroy {
   pet: Pet | null = null;
+  isFavorited: boolean = false;
+  isAuthenticated$: Observable<boolean>;
+  currentImageIndex = 0;
+  private favoriteSub: Subscription | undefined;
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
     private petService: PetService,
-    private favoritesService: FavoritesService,
-    private toastr: ToastrService
-  ) {}
+    private favoritesService: FavoritesService, 
+    private authService: AuthService
+  ) {
+    this.isAuthenticated$ = this.authService.isAuthenticated$;
+  }
 
   ngOnInit(): void {
     const petId = Number(this.route.snapshot.paramMap.get('id'));
     if (petId) {
-      this.loadPet(petId);
-    } else {
-      this.router.navigate(['/feed']);
+      this.loadPetDetails(petId);
+      // Escuta as mudanças nos favoritos
+      this.favoriteSub = this.favoritesService.favorites$.subscribe(favs => {
+        this.isFavorited = favs.includes(petId);
+      });
     }
   }
 
-  private loadPet(id: number): void {
-    this.petService.getPetById(id).subscribe({
-      next: (pet) => {
-        if (pet) {
-          this.pet = pet;
-        } else {
-          this.toastr.error('Pet não encontrado');
-          this.router.navigate(['/feed']);
-        }
-      },
-      error: () => {
-        this.toastr.error('Erro ao carregar informações do pet');
-        this.router.navigate(['/feed']);
+  ngOnDestroy(): void {
+    // Cancela a inscrição para evitar memory leaks
+    if (this.favoriteSub) {
+      this.favoriteSub.unsubscribe();
+    }
+  }
+
+  loadPetDetails(id: number): void {
+    this.petService.getPetById(id).subscribe(pet => {
+      if (pet) {
+        this.pet = pet;
       }
     });
   }
 
-  get isFavorite(): boolean {
-    return this.pet ? this.favoritesService.isFavorite(this.pet.id) : false;
+  toggleFavorite(): void {
+    if (this.pet) {
+      this.favoritesService.toggleFavorite(this.pet.id);
+    }
   }
 
-  toggleFavorite(): void {
-    if (!this.pet) return;
+  nextImage(): void {
+    if (this.pet && this.pet.imageUrls.length > 1) {
+      this.currentImageIndex = (this.currentImageIndex + 1) % this.pet.imageUrls.length;
+    }
+  }
 
-    if (this.isFavorite) {
-      this.favoritesService.removeFromFavorites(this.pet.id);
-      this.toastr.success(`${this.pet.name} removido dos favoritos`);
-    } else {
-      this.favoritesService.addToFavorites(this.pet.id);
-      this.toastr.success(`${this.pet.name} adicionado aos favoritos`);
+  previousImage(): void {
+    if (this.pet && this.pet.imageUrls.length > 1) {
+      this.currentImageIndex = (this.currentImageIndex - 1 + this.pet.imageUrls.length) % this.pet.imageUrls.length;
     }
   }
 }

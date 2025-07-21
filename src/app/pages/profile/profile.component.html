@@ -91,7 +91,7 @@
       <h2>Estatísticas</h2>
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-number">{{ user.favoritesPets.length || 0 }}</div>
+          <div class="stat-number">{{ favoriteCount$ | async }}</div>
           <div class="stat-label">Pets Favoritados</div>
         </div>
         <div class="stat-card" *ngIf="user.userType === 'adotante'">
