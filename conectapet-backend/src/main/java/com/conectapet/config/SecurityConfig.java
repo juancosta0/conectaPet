@@ -41,11 +41,12 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
+                // --- MUDANÇA PARA TESTE ---
+                // Permite TODAS as requisições temporariamente
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/h2-console/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/pets", "/api/pets/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
+                // -------------------------
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -55,14 +56,12 @@ public class SecurityConfig {
         return http.build();
     }
 
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // É importante ter a URL de desenvolvimento e a de produção
         configuration.setAllowedOrigins(Arrays.asList(
             "http://localhost:4200",
-            "https://conectapetdev.netlify.app/feed"
+            "https://SUA-URL-DO-NETLIFY.netlify.app" // TROQUE PELA SUA URL REAL
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
