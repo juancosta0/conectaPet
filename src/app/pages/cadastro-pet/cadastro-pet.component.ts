@@ -3,7 +3,6 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PetService } from '../../services/pet.service';
 import { Router } from '@angular/router';
-import { Pet } from '../../types/pet.type';
 
 @Component({
   selector: 'app-cadastro-pet',
@@ -32,6 +31,15 @@ export class CadastroPetComponent {
     });
   }
 
+  // Métodos que estavam faltando
+  navigate() {
+    this.router.navigate(['/login']);
+  }
+
+  getDescriptionLength(): number {
+    return this.petForm.get('description')?.value?.length || 0;
+  }
+
   onFileSelected(event: any): void {
     const files = event.target.files;
     if (files) {
@@ -50,29 +58,13 @@ export class CadastroPetComponent {
   }
 
   onSubmit(): void {
-    if (this.petForm.invalid) {
-      console.error('Formulário inválido');
+    if (this.petForm.invalid || this.imageUrls.length === 0) {
       return;
     }
-
-    if (this.imageUrls.length === 0) {
-      console.error('É necessário adicionar pelo menos uma imagem.');
-      return;
-    }
-
-    const petData = {
-      ...this.petForm.value,
-      imageUrls: this.imageUrls
-    };
-
+    const petData = { ...this.petForm.value, imageUrls: this.imageUrls };
     this.petService.createPet(petData).subscribe({
-      next: () => {
-        console.log('Pet cadastrado com sucesso!');
-        this.router.navigate(['/feed']);
-      },
-      error: (err) => {
-        console.error('Erro ao cadastrar pet:', err);
-      }
+      next: () => this.router.navigate(['/feed']),
+      error: (err) => console.error('Erro ao cadastrar pet:', err)
     });
   }
 }
