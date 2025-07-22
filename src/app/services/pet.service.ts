@@ -1,41 +1,43 @@
 // src/app/services/pet.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Pet } from '../types/pet.type';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PetService {
-  private apiUrl = 'http://localhost:8080/api/pets';
+  private apiUrl = `${environment.apiUrl}/api/pets`;
 
   constructor(private http: HttpClient) {}
 
-  private getAuthHeaders() {
+  private getAuthHeaders(): HttpHeaders {
+    // Pega o token diretamente do sessionStorage
     const token = sessionStorage.getItem('auth-token');
-    return {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    };
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
   }
 
-  // Método público para buscar todos os pets
-  getAllPets(): Observable<Pet[]> {
+  getPets(): Observable<Pet[]> {
     return this.http.get<Pet[]>(this.apiUrl);
   }
 
-  // Métodos que exigem autenticação
-  getPetById(id: number): Observable<Pet | undefined> {
-    return this.http.get<Pet>(`${this.apiUrl}/${id}`, { headers: this.getAuthHeaders() });
+  getPetById(id: string): Observable<Pet> {
+    return this.http.get<Pet>(`${this.apiUrl}/${id}`);
   }
 
-  getFavoritesPets(favoriteIds: number[]): Observable<Pet[]> {
-    const params = favoriteIds.join(',');
-    return this.http.get<Pet[]>(`${this.apiUrl}/favorites?ids=${params}`, { headers: this.getAuthHeaders() });
+  createPet(pet: Omit<Pet, 'id' | 'user' | 'adoptionRequests'>): Observable<Pet> {
+    return this.http.post<Pet>(this.apiUrl, pet, { headers: this.getAuthHeaders() });
   }
 
-  createPet(petData: any): Observable<Pet> {
-    return this.http.post<Pet>(this.apiUrl, petData, { headers: this.getAuthHeaders() });
+  updatePet(id: string, pet: Partial<Pet>): Observable<Pet> {
+    return this.http.put<Pet>(`${this.apiUrl}/${id}`, pet, { headers: this.getAuthHeaders() });
+  }
+
+  deletePet(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getAuthHeaders() });
   }
 }

@@ -1,38 +1,38 @@
 // src/app/services/login.service.ts
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
+import { LoginRequest } from '../types/login-request.type';
 import { LoginResponse } from '../types/login-response.type';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
+import { User } from '../types/user.type';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginService {
-  private apiUrl: string = "http://localhost:8080/auth";
+  private apiUrl = `${environment.apiUrl}/auth`;
 
   constructor(
     private httpClient: HttpClient,
     private authService: AuthService
   ) { }
 
-  login(email: string, senha: string){
-    return this.httpClient.post<LoginResponse>(`${this.apiUrl}/login`, { email, password: senha }).pipe(
-      tap((value) => {
-        sessionStorage.setItem("auth-token", value.token)
-        sessionStorage.setItem("username", value.name)
-        this.authService.login(); // 3. Notifique o AuthService sobre o login
+  login(loginRequest: LoginRequest): Observable<LoginResponse> {
+    return this.httpClient.post<LoginResponse>(`${this.apiUrl}/login`, loginRequest).pipe(
+      tap(response => {
+        if (response && response.token) {
+          // Salva o token diretamente no sessionStorage
+          sessionStorage.setItem('auth-token', response.token);
+          // Atualiza o estado de autenticação no AuthService
+          this.authService.login();
+        }
       })
-    )
+    );
   }
 
-  register(userData: any) {
-    return this.httpClient.post<LoginResponse>(`${this.apiUrl}/register`, userData).pipe(
-      tap((value) => {
-        sessionStorage.setItem("auth-token", value.token)
-        sessionStorage.setItem("username", value.name)
-        this.authService.login(); // 4. Notifique o AuthService sobre o registro
-      })
-    )
+  register(registerRequest: User): Observable<User> {
+    return this.httpClient.post<User>(`${this.apiUrl}/register`, registerRequest);
   }
 }

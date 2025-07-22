@@ -1,52 +1,67 @@
+// src/app/services/user.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { UserProfile } from '../types/user.type';
+import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:8080/api/users';
+  private apiUrl = `${environment.apiUrl}/api/users`;
   private currentUserSubject = new BehaviorSubject<UserProfile | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+    ) {
     this.loadCurrentUserFromToken();
   }
 
-  private getAuthHeaders() {
+  private getAuthHeaders(): HttpHeaders {
+    // Pega o token diretamente do sessionStorage
     const token = sessionStorage.getItem('auth-token');
-    return {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    };
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
   }
 
-  private loadCurrentUserFromToken(): void {
+  private loadCurrentUserFromToken() {
     const token = sessionStorage.getItem('auth-token');
     if (token) {
-      this.http.get<UserProfile>(`${this.apiUrl}/profile`, { headers: this.getAuthHeaders() })
-        .subscribe({
-          next: (user) => this.currentUserSubject.next(user),
-          error: () => this.currentUserSubject.next(null)
-        });
+      try {
+        const decodedToken: any = jwtDecode(token);
+        const userId = decodedToken.userId;
+        if (userId) {
+          this.getUserProfile(userId).subscribe(user => {
+            this.currentUserSubject.next(user);
+          });
+        }
+      } catch (error) {
+        console.error("Failed to decode token, logging out.", error);
+        // Chama o método logout do AuthService para limpar tudo
+        this.authService.logout();
+      }
     }
   }
 
-  getCurrentUser(): UserProfile | null {
-    return this.currentUserSubject.value;
+  getUserProfile(userId: string): Observable<UserProfile> {
+    return this.http.get<UserProfile>(`${this.apiUrl}/${userId}`, { headers: this.getAuthHeaders() }).pipe(
+      tap(user => {
+        this.currentUserSubject.next(user);
+      })
+    );
   }
 
-  updateProfile(userData: Partial<UserProfile>): Observable<UserProfile | null> {
-    return this.http.put<UserProfile>(`${this.apiUrl}/profile`, userData, { headers: this.getAuthHeaders() })
-      .pipe(
-        tap((updatedUser: UserProfile) => this.currentUserSubject.next(updatedUser))
-      );
-  }
-
-  getUserById(id: number): Observable<UserProfile> {
-    return this.http.get<UserProfile>(`${this.apiUrl}/${id}`, { headers: this.getAuthHeaders() });
+  updateUserProfile(userId: string, profile: Partial<UserProfile>): Observable<UserProfile> {
+    return this.http.put<UserProfile>(`${this.apiUrl}/${userId}`, profile, { headers: this.getAuthHeaders() }).pipe(
+      tap(updatedUser => {
+        this.currentUserSubject.next(updatedUser);
+      })
+    );
   }
 }
