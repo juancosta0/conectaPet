@@ -63,7 +63,7 @@ public class SecurityConfig {
         // Lembre-se de colocar sua URL final da Netlify aqui
         configuration.setAllowedOrigins(Arrays.asList(
             "http://localhost:4200",
-            "https://SUA-URL-DO-NETLIFY.netlify.app"
+            "https://conectapetdev.netlify.app/"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
