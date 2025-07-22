@@ -41,11 +41,10 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-                // --- CONFIGURAÇÃO DE SEGURANÇA FINAL ---
                 .authorizeHttpRequests(auth -> auth
-                        // Libera rotas de autenticação (login/cadastro)
+                        // Libera as rotas de autenticação (login/cadastro) para todos
                         .requestMatchers("/auth/**").permitAll()
-                        // Libera a busca de pets para todos (método GET)
+                        // Libera a busca de pets (método GET) para todos
                         .requestMatchers(HttpMethod.GET, "/api/pets/**").permitAll()
                         // Exige autenticação para qualquer outra rota
                         .anyRequest().authenticated()
@@ -60,13 +59,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Lembre-se de colocar sua URL final da Netlify aqui
+        // IMPORTANTE: Coloque a URL correta e final do seu site da Netlify aqui!
         configuration.setAllowedOrigins(Arrays.asList(
             "http://localhost:4200",
-            "https://conectapetdev.netlify.app/"
+            "https://conectapetdev.netlify.app"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Origin"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
