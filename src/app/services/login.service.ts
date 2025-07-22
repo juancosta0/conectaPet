@@ -23,16 +23,15 @@ export class LoginService {
     return this.httpClient.post<LoginResponse>(`${this.apiUrl}/login`, loginRequest).pipe(
       tap(response => {
         if (response && response.token) {
-          // Salva o token diretamente no sessionStorage
           sessionStorage.setItem('auth-token', response.token);
-          // Atualiza o estado de autenticação no AuthService
           this.authService.login();
         }
       })
     );
   }
 
-  register(registerRequest: User): Observable<User> {
+  // CORREÇÃO AQUI
+  register(registerRequest: Omit<User, 'id' | 'createdAt'>): Observable<User> {
     return this.httpClient.post<User>(`${this.apiUrl}/register`, registerRequest);
   }
 }

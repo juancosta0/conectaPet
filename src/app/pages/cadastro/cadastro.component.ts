@@ -1,113 +1,60 @@
-import { Component, OnInit } from '@angular/core';
-import { MaterialModules } from '../../material';
-import { DefaultLoginLayoutComponent } from '../../components/default-login-layout/default-login-layout.component';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { PrimaryInputComponent } from '../../components/primary-input/primary-input.component';
+// src/app/pages/cadastro/cadastro.component.ts
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LoginService } from '../../services/login.service';
-import { ToastrService } from 'ngx-toastr';
-import { MatRadioModule } from '@angular/material/radio';
-import { CommonModule } from '@angular/common';
-
-interface CadastroForm {
-  userType: FormControl<string | null>;
-  name: FormControl<string | null>;
-  email: FormControl<string | null>;
-  password: FormControl<string | null>;
-  passwordConfirm: FormControl<string | null>;
-  cnpj: FormControl<string | null>;
-  descricao: FormControl<string | null>;
-  acceptTerms: FormControl<boolean | null>;
-}
+import { User } from '../../types/user.type'; // Importar tipo User
 
 @Component({
   selector: 'app-cadastro',
-  standalone: true,
-  imports: [MaterialModules, ReactiveFormsModule, DefaultLoginLayoutComponent, PrimaryInputComponent, MatRadioModule, CommonModule],
   templateUrl: './cadastro.component.html',
-  styleUrl: './cadastro.component.scss',
+  styleUrls: ['./cadastro.component.scss']
 })
-export class CadastroComponent implements OnInit {
-  cadastroForm!: FormGroup<CadastroForm>;
+export class CadastroComponent {
+  registerForm: FormGroup;
+  userType: 'tutor' | 'ong' = 'tutor';
 
   constructor(
-    private router: Router,
+    private fb: FormBuilder,
     private loginService: LoginService,
-    private toastService: ToastrService
+    private router: Router
   ) {
-    this.cadastroForm = new FormGroup({
-      userType: new FormControl('adotante', [Validators.required]),
-      name: new FormControl('', [Validators.required, Validators.minLength(3)]),
-      email: new FormControl('', [Validators.required, Validators.email]),
-      password: new FormControl('', [Validators.required, Validators.minLength(6)]),
-      passwordConfirm: new FormControl('', [Validators.required, Validators.minLength(6)]),
-      cnpj: new FormControl({ value: '', disabled: true }, [Validators.required, Validators.minLength(14)]),
-      descricao: new FormControl({ value: '', disabled: true }, [Validators.required, Validators.maxLength(250)]),
-      acceptTerms: new FormControl(false, [Validators.requiredTrue])
+    this.registerForm = this.fb.group({
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      userType: ['tutor', Validators.required],
+      cnpj: [''],
+      description: [''],
+      city: ['']
     });
-  }
 
-  ngOnInit(): void {
-    const userTypeControl = this.cadastroForm.get('userType');
-    const cnpjControl = this.cadastroForm.get('cnpj');
-    const descricaoControl = this.cadastroForm.get('descricao');
-
-    userTypeControl?.valueChanges.subscribe(userType => {
-      if (userType === 'ong') {
-        cnpjControl?.enable();
-        descricaoControl?.enable();
+    this.registerForm.get('userType')?.valueChanges.subscribe(value => {
+      this.userType = value;
+      const cnpjControl = this.registerForm.get('cnpj');
+      if (value === 'ong') {
+        cnpjControl?.setValidators([Validators.required]);
       } else {
-        cnpjControl?.disable();
-        descricaoControl?.disable();
-        cnpjControl?.reset();
-        descricaoControl?.reset();
+        cnpjControl?.clearValidators();
       }
+      cnpjControl?.updateValueAndValidity();
     });
   }
 
-  passwordsMatch(): boolean {
-    const password = this.cadastroForm.get('password')?.value;
-    const passwordConfirm = this.cadastroForm.get('passwordConfirm')?.value;
-    return password === passwordConfirm && password !== '';
-  }
-
-  getDescriptionLength(): number {
-    return this.cadastroForm.get('descricao')?.value?.length || 0;
-  }
-
-  submit() {
-    if (this.cadastroForm.valid) {
-      if (!this.passwordsMatch()) {
-        this.toastService.error('As senhas não coincidem!');
-        return;
-      }
-
-      const formData = this.cadastroForm.value;
-      const registerData = {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        userType: formData.userType,
-        cnpj: formData.userType === 'ong' ? formData.cnpj : null,
-        description: formData.userType === 'ong' ? formData.descricao : null
-      };
+  onSubmit() {
+    if (this.registerForm.valid) {
+      // Garantir que o tipo está correto
+      const registerData: Omit<User, 'id' | 'createdAt'> = this.registerForm.value;
 
       this.loginService.register(registerData).subscribe({
         next: () => {
-          this.toastService.success('Cadastro realizado com sucesso!');
-          this.router.navigate(['feed']);
+          console.log('Usuário registrado com sucesso!');
+          this.router.navigate(['/login']);
         },
         error: (err) => {
-          this.toastService.error('Erro ao realizar cadastro. Tente novamente.');
-          console.error('Erro no cadastro:', err);
+          console.error('Erro no registro', err);
         }
       });
-    } else {
-      this.toastService.error('Por favor, preencha todos os campos obrigatórios!');
     }
-  }
-
-  navigate() {
-    this.router.navigate(['login']);
   }
 }

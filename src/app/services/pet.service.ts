@@ -1,6 +1,6 @@
 // src/app/services/pet.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Pet } from '../types/pet.type';
 import { environment } from '../../environments/environment';
@@ -14,7 +14,6 @@ export class PetService {
   constructor(private http: HttpClient) {}
 
   private getAuthHeaders(): HttpHeaders {
-    // Pega o token diretamente do sessionStorage
     const token = sessionStorage.getItem('auth-token');
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`
@@ -24,6 +23,13 @@ export class PetService {
   getPets(): Observable<Pet[]> {
     return this.http.get<Pet[]>(this.apiUrl);
   }
+
+  // NOVO MÉTODO ADICIONADO
+  getPetsByIds(ids: string[]): Observable<Pet[]> {
+    const params = new HttpParams().set('ids', ids.join(','));
+    return this.http.get<Pet[]>(`${this.apiUrl}/by-ids`, { params });
+  }
+
 
   getPetById(id: string): Observable<Pet> {
     return this.http.get<Pet>(`${this.apiUrl}/${id}`);

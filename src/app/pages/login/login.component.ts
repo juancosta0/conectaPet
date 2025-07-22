@@ -1,49 +1,42 @@
+// src/app/pages/login/login.component.ts
 import { Component } from '@angular/core';
-import { DefaultLoginLayoutComponent } from '../../components/default-login-layout/default-login-layout.component';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { PrimaryInputComponent } from '../../components/primary-input/primary-input.component';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LoginService } from '../../services/login.service';
-import { ToastrService } from 'ngx-toastr';
+import { LoginRequest } from '../../types/login-request.type'; // Importar tipo
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [
-    DefaultLoginLayoutComponent,
-    ReactiveFormsModule,
-    PrimaryInputComponent
-  ],
-  providers: [
-    LoginService
-  ],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  loginForm!: FormGroup;
+  loginForm: FormGroup;
 
   constructor(
-    private router: Router,
+    private fb: FormBuilder,
     private loginService: LoginService,
-    private toast: ToastrService
-  ){
-    this.loginForm = new FormGroup({
-      email: new FormControl('', [Validators.required, Validators.email]),
-      password: new FormControl('', [Validators.required, Validators.minLength(6)])
-    })
+    private router: Router
+  ) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required]
+    });
   }
 
-  submit(){
-    this.loginService.login(this.loginForm.value.email, this.loginForm.value.password).subscribe({
-      next: () => this.router.navigate(["feed"]),
-      error: (err) => {
-        this.toast.error("Email ou senha incorretos!");
-      }
-    })
-  }
-
-  navigate(){
-    this.router.navigate(["cadastro"])
+  onSubmit() {
+    if (this.loginForm.valid) {
+      // CORREÇÃO AQUI
+      const loginRequest: LoginRequest = this.loginForm.value;
+      this.loginService.login(loginRequest).subscribe({
+        next: () => {
+          this.router.navigate(['/feed']);
+        },
+        error: (err) => {
+          console.error('Login falhou', err);
+          // Adicionar feedback para o usuário aqui
+        }
+      });
+    }
   }
 }
